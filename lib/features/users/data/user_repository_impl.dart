@@ -16,10 +16,6 @@ class UserRepositoryImpl {
     final result = await remote.login(email, password);
     final user = UserModel.fromJson(result);
 
-    // Guardar token en almacenamiento local
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString("token", user.token);
-
     return user;
   }
 }

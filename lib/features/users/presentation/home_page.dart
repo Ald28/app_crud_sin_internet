@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../../core/auth/auth_service.dart';
+import 'login_page.dart';
 
 class HomePage extends StatelessWidget {
   final String userId;
@@ -15,15 +15,17 @@ class HomePage extends StatelessWidget {
           IconButton(
             icon: Icon(Icons.logout),
             onPressed: () async {
-              await AuthService.clearToken();
-              Navigator.pushReplacementNamed(context, "/login");
+
+              Navigator.pushAndRemoveUntil(
+                context,
+                MaterialPageRoute(builder: (_) => LoginPage()),
+                (_) => false,
+              );
             },
-          )
+          ),
         ],
       ),
-      body: Center(
-        child: Text("Has iniciado sesión correctamente"),
-      ),
+      body: Center(child: Text("Has iniciado sesión correctamente")),
     );
   }
 }

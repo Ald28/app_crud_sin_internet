@@ -4,21 +4,36 @@ import 'features/users/presentation/login_page.dart';
 import 'features/users/presentation/home_page.dart';
 
 class App extends StatelessWidget {
-  final String? initialToken;
+  const App({super.key});
 
-  const App({required this.initialToken, super.key});
+  Future<Map<String, dynamic>> _loadSession() async {
+    return await AuthService.loadSession();
+  }
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: initialToken != null && initialToken!.isNotEmpty
-          ? HomePage(userId: "TOKEN")
-          : LoginPage(),
-      routes: {
-        "/login": (_) => LoginPage(),
-        "/home": (_) => HomePage(userId: "TOKEN")
-      },
+      home: FutureBuilder(
+        future: _loadSession(),
+        builder: (context, snapshot) {
+          if (!snapshot.hasData) {
+            return const Scaffold(
+              body: Center(child: CircularProgressIndicator()),
+            );
+          }
+
+          final session = snapshot.data!;
+          final token = session["token"];
+          final userId = session["userId"];
+
+          if (token != null && userId != null) {
+            return HomePage(userId: userId);
+          }
+
+          return LoginPage();
+        },
+      ),
     );
   }
 }
