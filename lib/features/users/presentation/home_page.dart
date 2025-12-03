@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:prueba_emp/features/users/presentation/create_product_page.dart';
 import 'login_page.dart';
 import 'products_page.dart';
 
@@ -40,6 +41,15 @@ class HomePage extends StatelessWidget {
                 );
               },
               child: Text("Ver productos"),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => CreateProductPage()),
+                );
+              },
+              child: Text("Crear producto"),
             ),
           ],
         ),

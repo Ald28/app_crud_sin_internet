@@ -10,8 +10,9 @@ class ProductRemoteDataSource {
 
     final productsJson = response.data["products"] as List;
 
-    final products =
-        productsJson.map((json) => ProductModel.fromJson(json)).toList();
+    final products = productsJson
+        .map((json) => ProductModel.fromJson(json))
+        .toList();
 
     return {
       "page": response.data["page"],
@@ -19,5 +20,14 @@ class ProductRemoteDataSource {
       "totalItems": response.data["totalItems"],
       "products": products,
     };
+  }
+
+  Future<ProductModel> createProduct(String name, double price) async {
+    final response = await dio.post(
+      "/products/register",
+      data: {"name": name, "price": price},
+    );
+
+    return ProductModel.fromJson(response.data["product"]);
   }
 }
