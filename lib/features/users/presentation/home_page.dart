@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'login_page.dart';
+import 'products_page.dart';
 
 class HomePage extends StatelessWidget {
   final String userId;
@@ -15,7 +16,6 @@ class HomePage extends StatelessWidget {
           IconButton(
             icon: Icon(Icons.logout),
             onPressed: () async {
-
               Navigator.pushAndRemoveUntil(
                 context,
                 MaterialPageRoute(builder: (_) => LoginPage()),
@@ -25,7 +25,25 @@ class HomePage extends StatelessWidget {
           ),
         ],
       ),
-      body: Center(child: Text("Has iniciado sesión correctamente")),
+      body: Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text("Has iniciado sesión correctamente"),
+            SizedBox(height: 20),
+
+            ElevatedButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => ProductsPage()),
+                );
+              },
+              child: Text("Ver productos"),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
