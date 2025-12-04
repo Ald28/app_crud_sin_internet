@@ -38,7 +38,7 @@ class ProductModel {
       price: (json["price"] as num).toDouble(),
       userId: json["userId"],
       createdAt: DateTime.parse(json["createdAt"]),
-      userEmail: json["user"]["email"],
+      userEmail: json["user"]?["email"] ?? "",
     );
   }
 }

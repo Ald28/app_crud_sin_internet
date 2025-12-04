@@ -36,7 +36,10 @@ class ProductLocalDataSource {
 
   Future<List<Map<String, dynamic>>> getPendingProducts() async {
     final box = await Hive.openBox(pendingBox);
-    return box.values.cast<Map<String, dynamic>>().toList();
+
+    return box.values.map((e) {
+      return Map<String, dynamic>.from(e as Map);
+    }).toList();
   }
 
   Future<void> clearPending() async {

@@ -1,6 +1,7 @@
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'datasources/product_remote_datasource.dart';
 import 'datasources/product_local_datasource.dart';
+import 'package:internet_connection_checker/internet_connection_checker.dart';
 
 class ProductRepositoryImpl {
   final ProductRemoteDataSource remote;
@@ -59,20 +60,31 @@ class ProductRepositoryImpl {
 
   ///   CREAR PRODUCTO
   Future<String> createProduct(String name, double price) async {
-    final connectivity = await Connectivity().checkConnectivity();
+    final hasInternet = await InternetConnectionChecker().hasConnection;
 
-    // SIN INTERNET → guardar pendiente
-    if (connectivity == ConnectivityResult.none) {
-      await local.savePendingProduct({"name": name, "price": price});
+    if (!hasInternet) {
+      print("⚠️ Sin internet → guardando en pendientes");
+      await local.savePendingProduct({
+        "name": name,
+        "price": price,
+      });
       return "Producto guardado offline (pendiente de sincronización)";
     }
 
-    // ONLINE → enviar al servidor
-    final created = await remote.createProduct(name, price);
+    try {
+      final created = await remote.createProduct(name, price);
+      await local.saveProduct(created);
+      return "Producto creado exitosamente";
+    } catch (e, s) {
+      print("❌ ERROR API → $e");
+      print(s);
 
-    // Guardar en local
-    await local.saveProduct(created);
-
-    return "Producto creado exitosamente";
+      print("❌ Error enviando, guardando en offline");
+      await local.savePendingProduct({
+        "name": name,
+        "price": price,
+      });
+      return "Producto guardado offline (será sincronizado)";
+    }
   }
 }
