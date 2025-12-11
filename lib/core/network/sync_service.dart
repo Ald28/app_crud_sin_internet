@@ -3,6 +3,7 @@ import 'dart:async';
 
 import '../../../features/users/data/datasources/product_local_datasource.dart';
 import '../../../features/users/data/datasources/product_remote_datasource.dart';
+import 'package:prueba_emp/core/notifications/notification_service.dart';
 
 class SyncService {
   // ---- SINGLETON ----
@@ -45,14 +46,16 @@ class SyncService {
 
     for (var item in pending) {
       try {
-        final created = await remote.createProduct(
-          item["name"],
-          item["price"],
-        );
+        final created = await remote.createProduct(item["name"], item["price"]);
 
         await local.saveProduct(created);
 
         print("✅ Enviado: ${item["name"]}");
+
+        await NotificationService.show(
+          "Producto sincronizado",
+          "El producto '${item["name"]}' fue enviado al servidor exitosamente.",
+        );
       } catch (e) {
         print("❌ Error enviando producto: $e");
         return;

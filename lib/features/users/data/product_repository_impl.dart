@@ -21,7 +21,7 @@ class ProductRepositoryImpl {
         if (cached != null && cached.isNotEmpty) {
           return {
             "page": page,
-            "totalPages": 2,
+            "totalPages": 10,
             "totalItems": cached.length,
             "products": cached,
           };
