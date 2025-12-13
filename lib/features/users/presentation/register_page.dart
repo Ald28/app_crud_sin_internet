@@ -1,76 +1,44 @@
 import 'package:flutter/material.dart';
 import 'widgets/auth_card.dart';
-import '../../../core/auth/auth_service.dart';
-import 'home_page.dart';
-import 'register_page.dart';
 import '../../users/data/user_repository_impl.dart';
 import '../../users/data/datasources/user_remote_datasource.dart';
-import 'package:internet_connection_checker/internet_connection_checker.dart';
+import 'login_page.dart';
 
-class LoginPage extends StatefulWidget {
+class RegisterPage extends StatefulWidget {
   @override
-  State<LoginPage> createState() => _LoginPageState();
+  State<RegisterPage> createState() => _RegisterPageState();
 }
 
-class _LoginPageState extends State<LoginPage> {
+class _RegisterPageState extends State<RegisterPage> {
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
   bool showPassword = false;
 
   final repo = UserRepositoryImpl(UserRemoteDataSource());
 
-  Future<void> login() async {
-    final hasInternet = await InternetConnectionChecker().hasConnection;
-
-    if (!hasInternet) {
-      final session = await AuthService.loadSession();
-
-      if (session.isEmpty || session["email"] != emailController.text.trim()) {
-        _msg("No hay sesión guardada");
-        return;
-      }
-
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (_) => HomePage(userId: session["userId"])),
-      );
-      return;
-    }
-
+  Future<void> register() async {
     try {
-      final user = await repo.login(
+      final msg = await repo.register(
         emailController.text.trim(),
         passwordController.text.trim(),
       );
 
-      await AuthService.saveSession(
-        token: user.token,
-        userId: user.userId.toString(),
-        role: user.role.toString(),
-        email: emailController.text.trim(),
-      );
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg)));
 
-      Navigator.pushReplacement(
+      Navigator.pop(context);
+    } catch (e) {
+      ScaffoldMessenger.of(
         context,
-        MaterialPageRoute(
-          builder: (_) => HomePage(userId: user.userId.toString()),
-        ),
-      );
-    } catch (_) {
-      _msg("Credenciales incorrectas");
+      ).showSnackBar(const SnackBar(content: Text("Error al registrar")));
     }
-  }
-
-  void _msg(String msg) {
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg)));
   }
 
   @override
   Widget build(BuildContext context) {
     return AuthCard(
-      title: "Iniciar Sesión",
-      buttonText: "INGRESAR",
-      onSubmit: login,
+      title: "Registro",
+      buttonText: "CREAR CUENTA",
+      onSubmit: register,
       fields: [
         _input("Usuario", "Ingresa tu usuario", emailController),
         const SizedBox(height: 16),
@@ -80,10 +48,10 @@ class _LoginPageState extends State<LoginPage> {
         onPressed: () {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (_) => RegisterPage()),
+            MaterialPageRoute(builder: (_) => LoginPage()),
           );
         },
-        child: const Text("¿No tienes cuenta? Regístrate"),
+        child: const Text("¿Ya tienes cuenta? Inicia sesión"),
       ),
     );
   }
